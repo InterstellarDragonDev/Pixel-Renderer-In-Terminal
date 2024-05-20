@@ -12,33 +12,32 @@
 #include <string>
 
 
-
 struct Color {
     int r, g, b;
 };
 
-const int WIDTH = 200;
-const int HEIGHT = 200;
+int WIDTH = 0;
+int HEIGHT = 0;
 
 const Color NULL_COLOR = {-1, -1, -1};
 
-std::unordered_map<char, Color> colour_map = {
-    {'R', {255, 0, 0}},      // Bright red
-    {'G', {0, 255, 0}},      // Bright green
-    {'B', {0, 0, 255}},      // Bright blue
-    {'Y', {255, 255, 0}},    // Yellow
-    {'M', {255, 0, 255}},    // Magenta
-    {'C', {0, 255, 255}},    // Cyan
-    {'g', {100, 100, 100}},      // Grey
-};
-
-Color pixel_matrix[WIDTH][HEIGHT];
+std::vector<std::vector<Color>> pixel_matrix;
 
 
 //* ----------------------------------------------------------------------------------------------------------------------------- Functions start here
 
+// a little function that randomly generates a colour (used for testing purposes)
 Color random_color(){
    return {(rand() % 255) + 1, (rand() % 255) + 1, (rand() % 255) + 1} ;
+}
+
+// this resizes the pixel matrix when loading the image
+void resize_pixel_matrix(int num_rows, int num_cols) {
+    pixel_matrix.resize(num_rows);
+
+    for (auto& row : pixel_matrix) {
+        row.resize(num_cols);
+    }
 }
 
 // Function to compare two Color structs
@@ -47,8 +46,6 @@ bool operator==(const Color& c1, const Color& c2) {
 }
 
 void initialize() {
-    // this sets a new seed for the random number generation
-    srand((unsigned) time(0));
 
     for (int y = 0; y < HEIGHT; y++){
         for (int x = 0; x < WIDTH; x++){
@@ -74,18 +71,6 @@ void render() {
         std::cout << "\n";
     }
 }
-
-// prints out the test to make sure pixel rendering is working
-void test_pixels() {
-    std::cout << "rendering test: ";
-    for(auto i:colour_map) {
-        std::cout << i.first << " : ";
-        print_single_pixel(i.second);
-        std::cout << " ";
-    }
-    std::cout << "\n";
-}
-
 
 
 #endif

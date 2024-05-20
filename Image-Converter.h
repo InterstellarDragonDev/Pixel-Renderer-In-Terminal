@@ -10,34 +10,6 @@
 
 using namespace std;
 
-// function declaration
-std::vector<std::vector<png_byte>> read_png_file(const char* filename, int& width, int& height);
-
-void get_image_data(const char* image_name) {
-    int width, height;
-    std::vector<std::vector<png_byte>> pixel_data = read_png_file(image_name, width, height);
-
-    for (int y = 0; y < height; y++) {
-        png_bytep row = pixel_data[y].data();
-        for (int x = 0; x < width; x++) {
-
-            // this checks if we have gone past the limits of the canvas
-            if (x > WIDTH || y > HEIGHT) {
-            break;
-            }
-
-            png_bytep px = &(row[x * 4]);
-            // px[0] = red, px[1] = green, px[2] = blue, px[3] = alpha
-            if ((int)px[3] == 0) {
-               continue;  
-            }
-            Color pixel_colour = {(int)px[0], (int)px[1], (int)px[2]};
-            pixel_matrix[y][x] = pixel_colour;
-        }
-    }
-}
-
-
 // Function to read PNG file and get pixel data
 std::vector<std::vector<png_byte>> read_png_file(const char* filename, int& width, int& height) {
     FILE* fp = fopen(filename, "rb");
@@ -113,7 +85,29 @@ std::vector<std::vector<png_byte>> read_png_file(const char* filename, int& widt
     return pixel_data;
 }
 
+void get_image_data(const char* image_name) {
+    int width, height;
+    std::vector<std::vector<png_byte>> pixel_data = read_png_file(image_name, width, height);
 
+    resize_pixel_matrix(height, width);
+    WIDTH = width;
+    HEIGHT = height;
+
+    for (int y = 0; y < height; y++) {
+        png_bytep row = pixel_data[y].data();
+        for (int x = 0; x < width; x++) {
+
+            png_bytep px = &(row[x * 4]);
+            //* px[0] = red, px[1] = green, px[2] = blue, px[3] = alpha
+            if ((int)px[3] < 5) { // this makes sure pixels that are basically transparent are left transparent
+               pixel_matrix[y][x] = NULL_COLOR;
+               continue;  
+            }
+            Color pixel_colour = {(int)px[0], (int)px[1], (int)px[2]};
+            pixel_matrix[y][x] = pixel_colour;
+        }
+    }
+}
 
 
 
